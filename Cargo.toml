@@ -1,0 +1,7 @@
+[package]
+name = "ff-book"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+f2 = "0.1"
