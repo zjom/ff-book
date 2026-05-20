@@ -8,6 +8,7 @@ hand-written glue.
 ## Setting up an environment
 
 ```rust
+# extern crate f2;
 use f2::interpreter::Scope;
 use f2::prelude;
 
@@ -22,13 +23,16 @@ wires up everything documented in the
 ## Pushing Rust values into ff
 
 ```rust
+# extern crate f2;
 use f2::interop::define_value;
-use serde::Serialize;
+use f2::interpreter::Scope;
+use f2::interop::{Serialize, Deserialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct User { name: String, age: u32 }
 
-define_value(&env, "me", &User { name: "Ada".into(), age: 36 }).unwrap();
+let env = Scope::new();
+define_value(&env, "name", &User { name: "ff".into(), age: 36 }).unwrap();
 ```
 
 After this, ff scripts evaluated in `env` see `me` as an object with
@@ -41,8 +45,15 @@ native function. Arguments deserialize from ff values; the return type
 serializes back.
 
 ```rust
+# extern crate f2;
 use f2::interop::register;
+use f2::interop::{Serialize, Deserialize};
+use f2::interpreter::Scope;
 
+#[derive(Serialize, Deserialize)]
+struct User { name: String, age: u32 }
+
+let env = Scope::new();
 register(&env, "greet", |u: User| format!("Hello, {}!", u.name));
 ```
 
@@ -54,7 +65,11 @@ Scripts can now call `greet(me)` and either `greet(me)` or `greet(me)`
 Return `FfResult<T>` to surface a tagged pair to the caller:
 
 ```rust
+# extern crate f2;
+use f2::interop::register;
 use f2::interop::FfResult;
+use f2::interpreter::Scope;
+let env = Scope::new();
 
 register(&env, "checked_div", |a: i64, b: i64| -> FfResult<i64> {
     if b == 0 {
@@ -76,6 +91,12 @@ match checked_div(10, 0)
 Any `Result<T, E: Display>` converts in with `.into()`:
 
 ```rust
+# extern crate f2;
+use f2::interop::FfResult;
+use f2::interpreter::Scope;
+use f2::interop::register;
+
+let env = Scope::new();
 register(&env, "read", |path: String| -> FfResult<String> {
     std::fs::read_to_string(&path).map_err(|e| e.to_string()).into()
 });
@@ -84,19 +105,39 @@ register(&env, "read", |path: String| -> FfResult<String> {
 ## Evaluating scripts
 
 ```rust
+# extern crate f2;
 use f2::parser::parse;
 use f2::interpreter::eval_program;
+use f2::interpreter::Scope;
+use f2::interop::{define_value, register, Serialize, Deserialize};
 
-let prog = parse("greet(me)").unwrap();
+#[derive(Serialize, Deserialize)]
+struct User { name: String, age: u32 }
+
+let env = Scope::new();
+register(&env, "greet", |u: User| format!("Hello, {}!", u.name));
+define_value(&env, "user", &User { name: "ff".into(), age: 36 }).unwrap();
+let prog = parse("greet user").unwrap();
 let result = eval_program(&prog, &env).unwrap();
-assert_eq!(result.to_string(), "\"Hello, Ada!\"");
+assert_eq!(result.to_string(), "\"Hello, ff!\"");
 ```
 
 `eval_program` returns a `Value` — the same enum the interpreter uses
 internally. Use `from_value` to pull it back into a typed Rust value:
 
 ```rust
-use f2::interop::from_value;
+extern crate f2;
+use f2::parser::parse;
+use f2::interop::{register, from_value, define_value, Serialize, Deserialize};
+use f2::interpreter::{Scope, eval_program};
+
+#[derive(Serialize, Deserialize)]
+struct User { name: String, age: u32 }
+
+let env = Scope::new();
+define_value(&env, "name", &User { name: "ff".into(), age: 36 }).unwrap();
+register(&env, "greet", |u: User| format!("Hello, {}!", u.name));
+let prog = parse("greet(me)").unwrap();
 
 let n: i64 = from_value(eval_program(&parse("21 * 2").unwrap(), &env).unwrap()).unwrap();
 assert_eq!(n, 42);
@@ -120,6 +161,11 @@ When you register multi-argument natives, **put the data argument
 last** so calls compose under `|>`:
 
 ```rust
+# extern crate f2;
+use f2::interpreter::Scope;
+use f2::interop::register;
+
+let env = Scope::new();
 register(&env, "Greet.format", |greeting: String, name: String| -> String {
     format!("{}, {}!", greeting, name)
 });
