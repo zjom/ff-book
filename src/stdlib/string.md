@@ -54,6 +54,7 @@ String.slice(1, 4, "hello")               # "ell"
 | Function                  | Description                                       |
 |---------------------------|---------------------------------------------------|
 | `String.split(sep, s)`    | List of parts                                     |
+| `String.split_at(i, s)`    | Pair of parts. If `i` is oob, returns `[s, ""]`                                   |
 | `String.lines(s)`         | List of lines (split on `\n`)                     |
 | `String.chars(s)`         | List of single-character strings                  |
 | `String.join(sep, parts)` | Join a list of strings with `sep`                 |
