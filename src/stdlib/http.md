@@ -48,6 +48,6 @@ inspect the response either way.
 
 ```ff
 match Http.request({:url: "https://example.com", :method: "GET"})
-  [:ok, r]      -> println("status: " + r.status),
-  [:error, msg] -> println("failed: " + msg)
+  [:ok, r]      -> println("status: " :: r.status),
+  [:error, msg] -> println("failed: " :: msg)
 ```

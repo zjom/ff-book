@@ -22,7 +22,7 @@ delimiters balance.
 Create `hello.ff`:
 
 ```ff
-greet = name => "Hello, " + name + "!"
+greet = name => "Hello, " :: name :: "!"
 println(greet("world"))
 ```
 

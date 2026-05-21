@@ -40,15 +40,15 @@ double. This means no precision drift:
 2 ** 100           # 1267650600228229401496703205376
 ```
 
-`**` and `^` both mean exponentiation (right-associative). `%` is
-modulo. Division `/` produces a rational, not a truncated integer.
+`**` means exponentiation (right-associative). `%` is modulo.
+Division `/` produces a rational, not a truncated integer.
 
 ## Strings
 
-Strings are double-quoted, immutable, and concatenated with `+`:
+Strings are double-quoted, immutable, and concatenated with `::`:
 
 ```ff
-"abc" + "def"      # "abcdef"
+"abc" :: "def"     # "abcdef"
 ```
 
 The `~` operator tests substring containment; `!~` is its negation:

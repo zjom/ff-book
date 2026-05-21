@@ -128,15 +128,42 @@ println("with newline")
 Both write to stdout. In the REPL, `print` also adds a trailing newline
 for readability; in script mode it doesn't.
 
-## `::` (cons)
+## Operator natives
 
-The cons operator is also bound as a function under the name `::`, so
-you can `(::)` it like any other operator:
+Built-in infix operators are bound in the prelude as regular functions
+named with their operator characters. `1 + 2` and `(+)(1)(2)` are the
+same call. The set:
+
+| Name | Arity | Notes                                                        |
+|------|-------|--------------------------------------------------------------|
+| `+`  | 2     | number-only addition. Use `::` to concatenate strings.       |
+| `-`  | 2     | number subtraction.                                          |
+| `*`  | 2     | number multiplication.                                       |
+| `/`  | 2     | rational division. Division by `0` errors.                   |
+| `%`  | 2     | modulo. Modulo by `0` errors.                                |
+| `**` | 2     | exponentiation. Integer exponents only.                      |
+| `==` | 2     | structural equality across all values.                       |
+| `!=` | 2     | inverse of `==`.                                             |
+| `<`, `<=`, `>`, `>=` | 2 | ordering on numbers or strings.                    |
+| `~`  | 2     | substring containment for strings.                           |
+| `!~` | 2     | inverse of `~`.                                              |
+| `::` | 2     | strict cons. Use the `a :: b` syntax for the lazy form.      |
+
+Because they're regular bindings, you can pass them around, partially
+apply them, or shadow them:
 
 ```ff
-[(::), 1, [2, 3]]                  # contains the cons function
-((::))(1, [2, 3])                  # [1, 2, 3]
+plus = (+)
+[1, 2, 3] |> reduce(plus, 0)        # 6
+
+inc = (+)(1)                        # partial application
+inc(10)                             # 11
 ```
+
+The three operators with non-strict semantics — `&&`, `||`, and the
+infix-syntax `::` — are **not** ordinary bindings: they're special
+forms so they can short-circuit (`&&`/`||`) or capture the rhs lazily
+(`::`). Their function counterparts (`(::)`) are strict.
 
 ## Pre-imported modules
 

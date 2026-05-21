@@ -80,15 +80,36 @@ String.parse_int("nope")                  # [:error, "invalid digit found in str
 encoded — note that arithmetic in ff stays exact, so the value
 materializes back as a rational on use.
 
-## Concatenation
 
-Strings concatenate with `+`. `::` between two strings is also
-concatenation:
+## Format
+
+`format` currently only supports `printf` like string formatting.
+it expects format string and a list as parameters.
 
 ```ff
-"foo" + "bar"               # "foobar"
+String.format("{} + {} = {}", [1, 2, 3])     # "1 + 2 = 3"
+String.format("status: {}", [:ok])           # "status: :ok"
+String.format("{} {{}}", ["this is how you specify a literal "])           # "this is how you specify a literal {}"
+```
+
+
+You can specify indices in `{}`:
+
+```ff
+String.format("{0} {1} {0}", ["ping", "pong"])   # ping pong ping
+```
+
+
+## Concatenation
+
+Strings concatenate with `::`:
+
+```ff
+"foo" :: "bar"              # "foobar"
 "a" :: "bc"                 # "abc"
 ```
+
+`+` is number-only — using it on strings is a runtime type error.
 
 Cons-patterns peel one character off the front of a string, which is
 the basis for character-by-character processing without an explicit

@@ -85,7 +85,7 @@ In ff:
 ```ff
 match checked_div(10, 0)
   [:ok, n]      -> n,
-  [:error, msg] -> println("oops: " + msg)
+  [:error, msg] -> println("oops: " :: msg)
 ```
 
 Any `Result<T, E: Display>` converts in with `.into()`:

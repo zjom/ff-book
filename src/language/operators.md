@@ -1,6 +1,11 @@
 # Operators
 
 ff has a small set of built-in operators and lets you define your own.
+Most built-ins are just **regular prelude bindings** named with operator
+characters — `(+)`, `(*)`, `(==)`, etc. The parser desugars `a + b` to
+`(+)(a)(b)`, so the operator forms and the function forms are
+interchangeable. The only operators with bespoke evaluation are `&&`,
+`||`, and `::`, which have non-strict semantics.
 
 ## Built-in operators
 
@@ -8,11 +13,12 @@ ff has a small set of built-in operators and lets you define your own.
 
 | Op       | Meaning                | Precedence (tightest first) |
 |----------|------------------------|-----------------------------|
-| `**`, `^`| exponent (right-assoc) | 1                           |
+| `**`     | exponent (right-assoc) | 1                           |
 | `*`, `/`, `%` | mul, div, mod     | 2                           |
 | `+`, `-` | add, sub               | 3                           |
 
-All arithmetic is on exact rationals. `/` never truncates.
+All arithmetic is on exact rationals. `/` never truncates. `+` is
+number-only — use `::` to concatenate strings.
 
 ### Comparison
 
@@ -23,7 +29,8 @@ structurally on collections (`[1, 2] == [1, 2]`, `{1, 2, 3} == {3, 2, 1}`).
 
 ### Logical
 
-`&&`, `||`, `!`. `&&` and `||` short-circuit.
+`&&`, `||`, `!`. `&&` and `||` short-circuit — they are special forms,
+not regular functions.
 
 ### Cons
 
@@ -32,13 +39,15 @@ structurally on collections (`[1, 2] == [1, 2]`, `{1, 2, 3} == {3, 2, 1}`).
 | Left           | Right          | Result                                   |
 |----------------|----------------|------------------------------------------|
 | any value `v`  | list `xs`      | list with `v` at the head                |
-| string `a`     | string `b`     | concatenation (`a + b`)                  |
+| string `a`     | string `b`     | concatenation                            |
 | any value `v`  | set `xs`       | set with `v` inserted                    |
 | `[k, v]`       | object `o`     | object with `k → v` inserted             |
 
 Cons is the canonical way to build sequences incrementally; combined
 with [pattern matching](./patterns.md), it forms the basic shape of
-list-processing recursion.
+list-processing recursion. The right operand is captured lazily, which
+is what lets recursive stream builders like `f(x) :: map(f, rest)`
+terminate.
 
 ### Prefix
 
@@ -51,7 +60,7 @@ From tightest to loosest:
 
 1. function application (`f x`, `f(x)`), `.access`
 2. prefix `-`, `!`
-3. `**` / `^`
+3. `**`
 4. `*`, `/`, `%`
 5. `+`, `-`
 6. `^…`, `@…`  (custom "concat" ops)
@@ -89,19 +98,30 @@ match arrows).
 
 ### Using operators as values
 
-Wrap any operator name in parens to use it like an ordinary identifier:
+Wrap any operator name in parens to use it like an ordinary identifier.
+This works uniformly for built-ins and user-defined operators — they're
+the same kind of thing:
 
 ```ff
 plus = (+)
 [1, 2, 3] |> reduce(plus, 0)         # 6
 
+inc = (+)(1)                         # partial application
+inc(10)                              # 11
+
 cons = (::)
 cons(0, [1, 2, 3])                   # [0, 1, 2, 3]
 ```
 
-This works in both expressions and patterns, including for custom
-operators. To export a custom operator from a module, use the
-parenthesized form: `export (<|>)`.
+You can also shadow a built-in the same way you'd shadow any binding:
+
+```ff
+(+) = (a, b) => a - b
+2 + 3                                # -1
+```
+
+This works in both expressions and patterns. To export a custom
+operator from a module, use the parenthesized form: `export (<|>)`.
 
 ## Pipes and composition (prelude)
 

@@ -16,7 +16,7 @@ Env = import "Env"
 
 ```ff
 match Env.args()
-  [_, path, ..] -> println("running on " + path),
+  [_, path, ..] -> println("running on " :: path),
   _ -> println("usage: prog <path>")
 
 match Env.var("HOME")

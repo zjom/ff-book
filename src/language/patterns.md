@@ -72,7 +72,7 @@ matches:
 ```ff
 describe = match
   []          -> "empty",
-  [x]         -> "one: " + x,
+  [x]         -> "one: " :: x,
   [x, y]      -> "two",
   _           -> "many"
 ```
@@ -138,7 +138,7 @@ Function parameters are patterns, so destructuring composes naturally:
 ```ff
 first = [a, ..] => a
 add   = ([a, b], c) => a + b + c
-greet = {:name: n} => "Hi, " + n
+greet = {:name: n} => "Hi, " :: n
 ```
 
 A parameter that fails to match raises a runtime error at the call

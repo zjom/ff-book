@@ -24,8 +24,8 @@ Both produce lazy cons spines that terminate on EOF.
 [:ok, lines] = Io.stdin().lines()
 
 lines
-  |> map(s => "> " + s)
-  |> reduce((a, b) => a + "\n" + b, "")
+  |> map(s => "> " :: s)
+  |> reduce((a, b) => a :: "\n" :: b, "")
   |> println
 ```
 
