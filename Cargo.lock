@@ -321,7 +321,7 @@ dependencies = [
 
 [[package]]
 name = "ff-book"
-version = "0.1.2"
+version = "0.1.6"
 dependencies = [
  "f2",
 ]
