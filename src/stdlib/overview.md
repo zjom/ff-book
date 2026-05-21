@@ -51,15 +51,15 @@ Multi-argument native functions in the prelude and built-in modules
 take the **data argument last**, so calls compose under `|>`:
 
 ```ff
-xs
+(xs
   |> filter(p)
   |> map(f)
   |> List.take(5)
-  |> reduce((a, b) => a + b, 0)
+  |> reduce((a, b) => a + b, 0))
 
-config
+(config
   |> Object.put("retries", 3)
-  |> Object.put("timeout", 30)
+  |> Object.put("timeout", 30))
 ```
 
 Whenever you're not sure, the data argument is the last one. The same
