@@ -64,6 +64,15 @@ infinite sequences:
 [0..] |> filter(x => x % 2 == 0) |> take 5      # [0, 2, 4, 6, 8]
 ```
 
+### `take_while(p, xs)`
+
+Same as `take` but instead of returning the first `n` elements,
+we return elements until the predicate `p` evaluates to `false`.
+
+```ff
+[0..] |> take_while (n => n < 5)      # [0, 1, 2, 3, 4]
+```
+
 ### `rev(xs)`
 
 Reverses a sequence into a list:
